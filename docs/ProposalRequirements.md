@@ -62,10 +62,12 @@
   - What will the final product look like?
   - Will the simulator have a GUI?
     - In a perfect world, yes; action icons/names with colored borders corresponding to procs, maybe?
-    
+    - Perhaps include fields for user to input stats, if we have time
   - How will the AI 'play' the Game?
+    - Complete individual crafts and accumulate steps/score as an overall evaluation
 - Evaluation of correctness
   - How do we measure if the project is a success?
+    - Compare to high scores on official leaderboard
 - Schedule
   - Define 3 major components
   - Define deadlines
