@@ -60,5 +60,6 @@ Crafting Actions
 Notes:
 - Did not include Trained Eye. It is not possible to use on expert crafts, as they are level 80.
 - Anything that affects "touch" actions also affects Byregot's Blessing and the quality increase on Delicate Synthesis.
+    - Need to test whether Delicate Synthesis also increases IQ stacks.
 - Anything that can be used on a Good can also be used on an Excellent, but Excellent and Poor procs do not exist in expert crafts.
 - Base durability cost is 10.

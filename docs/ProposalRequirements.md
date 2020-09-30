@@ -4,32 +4,65 @@
 
 - Title
   - <10 Words
+  - Developing Strategies for Expert Crafting in Final Fantasy XIV?
 - Problem Statement
   - What needs to be solved?
+    - Identify successful strategies for expert crafting at a competitive level
   - 3+ Papers backing why / connecting to project
 - Problem Analysis
   - AI Type/Approach
+    - And/Or tree maybe? But this may lead to the AI "cheating" by choosing states where actions succeed/material conditions are favorable, which are things outside of its control
   - State Space
     - Enumerate if possible
+    - *Draft State Space:*
+        - Material Status (can do enum integer representation or string)
+        - Current CP (unsigned short)
+        - Current Durability (unsigned short)
+        - Current Progress (unsigned short)
+        - Current Quality (unsigned int)
+        - Buffs:
+            - \# Inner Quiet Stacks (unsigned short)
+            - Waste Not/Waste Not II turns left (can be one buff) (unsigned short)
+            - Manipulation turns left (unsigned short)
+            - Innovation turns left (unsigned short)
+            - Veneration turns left (unsigned short)
+            - Name of the Elements turns left (unsigned short)
+            - Final Appraisal turns left (unsigned short)
+            - Great Strides turns left (unsigned short)
+            - Muscle Memory turns left (unsigned short)
+            - Observe used last turn (bool)
   - State Transition Function
     - How does State get changed?
+        - Each action affects different state attributes; can probably implement classes to streamline this
     - Are transitions Deterministic/Stochastic
+        - Stochastic: some actions can fail, condition is chosen at random
   - Evaluation function
     - What is the goal?
+        - Full progress, quality >= 58000
     - How do we define better states from worse states?
+        - Higher quality
+        - Shallower solution depth
   - Problem Characteristics
     - Fully observable or partially observable?
+        - Fully: AI knows everything that will affect the outcome of its actions and what the outcome of each action will be (assuming success)
     - Single/multi agent
+        - Single
     - Deterministic/stochastic
+        - Stochastic: random material qualities, chance to fail some actions
     - Episodic/sequential
+        - Sequential: previous actions affect future actions
     - static/dynamic
+        - Static: no change between percepts
     - discrete/continuous
+        - Discrete: all values are represented as integers
 - Dataset
   - What data do we have access to?
   - How can this data be used to attack the problem
 - Deliverable
   - What will the final product look like?
   - Will the simulator have a GUI?
+    - In a perfect world, yes; action icons/names with colored borders corresponding to procs, maybe?
+    
   - How will the AI 'play' the Game?
 - Evaluation of correctness
   - How do we measure if the project is a success?
