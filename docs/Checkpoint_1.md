@@ -1,6 +1,7 @@
 # Developing Strategies for Expert Crafting in Final Fantasy XIV - Checkpoint 1
 
 ## Authors
+
 - [Shannon Conneilly](mailto:Shannon_Conneilly@student.uml.edu)
 - [Carlton Perkins](mailto:Carlton_Perkins@student.uml.edu)
 

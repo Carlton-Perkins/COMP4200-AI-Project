@@ -1,4 +1,4 @@
-# Developing Strategies for Expert Crafting in Final Fantasy XIV
+# DSECFFXIV: Developing Strategies for Expert Crafting in Final Fantasy XIV
 
 ## Authors
 
@@ -9,10 +9,9 @@
 
 | Folder/File |Purpose|
 |-|-|
-| bin/ | Binary/Run-able files|
-| docs/  | Supporting documentation |
-| simulator/ | Game simulation |
-| test/ | Python test modules |
-| ai/ | Game playing AI |
-| lib/ | Support libraries |
+| .pre-commit-config.yaml | [Pre-commit](https://pre-commit.com/) config file |
 | requirements.txt | Pip package requirements |
+| dsecffxiv/ | Project root |
+| dsecffxiv/tests | Python test modules |
+| dsecffxiv/algo | Algorithm backend |
+| docs/  | Supporting documentation |
