@@ -1,2 +1,6 @@
 # Python JIT Files
 *.pyc
+
+# VSCode IDE files
+.vscode/*
+*.code-workspace
