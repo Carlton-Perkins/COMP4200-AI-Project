@@ -60,7 +60,7 @@ class State:
             return 0  # got to end of sequence with no reward, but craft isn't broken/invalid
         collectability = self.quality // 10  # Find skyward score for craft
         if 5800 <= collectability < 6500:
-            return (collectability - 5800) + 175  # TODO: NEED SCORE AT 6499 COLLECTABILITY
+            return 0.1 * (collectability - 5800) + 175
         if 6500 <= collectability < 7700:
             return 0.45 * (collectability - 6500) + 370
         if collectability >= 7700:
