@@ -4,6 +4,7 @@ import math
 # and returns it. Equations for progress and quality were pulled from:
 # https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
 
+
 class Action:
 
     __CRAFTSMANSHIP = 2689
@@ -188,7 +189,7 @@ class MuscleMemory(Action):
         # This can only be used on the first turn, with 0 progress. No need for completion checking
         # (but we will need to make sure we ONLY use this on the first turn)
         state.progress = progress
-        state.muscle_memory = 5
+        state.muscle_memory = 6  # Extra turn because step function always decrements
         cp_loss = 6
         if state.material_condition == "pliant":
             cp_loss = 3
@@ -248,7 +249,7 @@ class NameoftheElements(Action):
 
     @staticmethod
     def execute(state):
-        state.name_elements = 3
+        state.name_elements = 4  # Extra turn because step always decrements
         cp_loss = 30
         if state.material_condition == "pliant":
             cp_loss = 15
@@ -261,7 +262,7 @@ class Veneration(Action):
 
     @staticmethod
     def execute(state):
-        state.veneration = 4
+        state.veneration = 5  # Extra turn because step always decrements
         cp_loss = 18
         if state.material_condition == "pliant":
             cp_loss = 9
@@ -275,7 +276,7 @@ class FinalAppraisal(Action):
 
     @staticmethod
     def execute(state):
-        state.final_appraisal = 5
+        state.final_appraisal = 6  # Extra turn because step always decrements
         state.cp -= 1
         return state
 
@@ -532,7 +533,7 @@ class GreatStrides(Action):
 
     @staticmethod
     def execute(state):
-        state.great_strides = 3
+        state.great_strides = 4  # Extra turn because step always decrements
         cp_loss = 32
         if state.material_condition == "pliant":
             cp_loss = 16
@@ -545,7 +546,7 @@ class Innovation(Action):
 
     @staticmethod
     def execute(state):
-        state.innovation = 4
+        state.innovation = 5  # Extra turn because step always decrements
         cp_loss = 18
         if state.material_condition == "pliant":
             cp_loss = 9
@@ -573,7 +574,7 @@ class Observe(Action):
 
     @staticmethod
     def execute(state):
-        state.observe = 1
+        state.observe = 2  # Extra turn because step always decrements
         cp_loss = 7
         if state.material_condition == "pliant":
             cp_loss = 4
@@ -658,7 +659,7 @@ class WasteNot(Action):
 
     @staticmethod
     def execute(state):
-        state.waste_not = 4
+        state.waste_not = 5  # Extra turn because step always decrements
         cp_loss = 56
         if state.material_condition == "pliant":
             cp_loss = 28
@@ -671,7 +672,7 @@ class WasteNot2(Action):
 
     @staticmethod
     def execute(state):
-        state.waste_not = 8
+        state.waste_not = 9  # Extra turn because step always decrements
         cp_loss = 98
         if state.material_condition == "pliant":
             cp_loss = 49
@@ -699,7 +700,7 @@ class Manipulation(Action):
 
     @staticmethod
     def execute(state):
-        state.manipulation = 8
+        state.manipulation = 9  # Extra turn because step always decrements
         cp_loss = 96
         if state.material_condition == "pliant":
             cp_loss = 48
