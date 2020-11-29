@@ -1,7 +1,8 @@
 import math
 
-# TODO: Implement skill failure handling, pliant proc handling
-
+# Represents crafting actions as state transition calculations. Each action takes a state as an argument, updates it,
+# and returns it. Equations for progress and quality were pulled from:
+# https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
 
 class Action:
 
@@ -53,6 +54,7 @@ class Action:
 
 
 class BasicSynthesis(Action):
+    # Increases progress with efficiency of 120. Costs 10 durability and 0 CP.
 
     @staticmethod
     def execute(state):
@@ -61,7 +63,6 @@ class BasicSynthesis(Action):
         if progress > BasicSynthesis.__MAX_PROGRESS:
             progress = BasicSynthesis.__MAX_PROGRESS
             if state.final_appraisal > 0:
-                # Check whether the buff falls off after you've "consumed" it; assuming yes for now
                 state.final_appraisal = 0
                 progress -= 1  # leave craft 1 progress off from completion
         state.progress = progress
@@ -69,23 +70,28 @@ class BasicSynthesis(Action):
         if state.waste_not > 0 or state.material_condition == "sturdy":
             durability_loss = 5
         elif state.waste_not > 0 and state.material_condition == "sturdy":
-            durability_loss = 3  # TODO: test this to double check whether the loss is 2 or 3
+            durability_loss = 3  # rounds against player
         state.durability -= durability_loss
         return state
 
 
 class RapidSynthesis(Action):
+    # Increases progress with efficiency of 500. Has a 50% success rate. Costs 10 durability and 0 CP.
 
     @staticmethod
     def execute(state):
-        progress, state = RapidSynthesis.__calc_progress(state, 500)
-        progress += state.progress
-        if progress > RapidSynthesis.__MAX_PROGRESS:
-            progress = RapidSynthesis.__MAX_PROGRESS
-            if state.final_appraisal > 0:
-                state.final_appraisal = 0
-                progress -= 1
-        state.progress = progress
+        success_threshold = 50
+        if state.material_condition == "centered":
+            success_threshold += 25
+        if state.success_val <= success_threshold:
+            progress, state = RapidSynthesis.__calc_progress(state, 500)
+            progress += state.progress
+            if progress > RapidSynthesis.__MAX_PROGRESS:
+                progress = RapidSynthesis.__MAX_PROGRESS
+                if state.final_appraisal > 0:
+                    state.final_appraisal = 0
+                    progress -= 1
+            state.progress = progress
         durability_loss = 10
         if state.waste_not > 0 or state.material_condition == "sturdy":
             durability_loss = 5
@@ -96,6 +102,7 @@ class RapidSynthesis(Action):
 
 
 class CarefulSynthesis(Action):
+    # Increases progress with efficiency of 150. Costs 10 durability and 7 CP.
 
     @staticmethod
     def execute(state):
@@ -108,20 +115,24 @@ class CarefulSynthesis(Action):
                 progress -= 1
         state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
-        state.cp -= 7
+        cp_loss = 7
+        if state.material_condition == "pliant":
+            cp_loss = 4
+        state.cp -= cp_loss
         return state
 
 
 class Groundwork(Action):
+    # Increases progress with efficiency of 300. Costs 20 durability and 18 CP. If current durability is less than the
+    # cost of the action, efficiency is reduced to 150.
 
     @staticmethod
     def execute(state):
-        # Double check whether efficiency penalty only applies if the craft will be broken
         durability_loss = 20
         efficiency = 300
         if state.waste_not > 0 or state.material_condition == "sturdy":
@@ -138,11 +149,16 @@ class Groundwork(Action):
                 state.final_appraisal = 0
                 progress -= 1
         state.progress = progress
-        state.cp -= 18
+        cp_loss = 18
+        if state.material_condition == "pliant":
+            cp_loss = 9
+        state.cp -= cp_loss
         return state
 
 
 class IntensiveSynthesis(Action):
+    # Increases progress with efficiency of 300. Can only be used when Material Condition is Good. Costs 10 durability
+    # and 6 CP.
 
     @staticmethod
     def execute(state):
@@ -155,16 +171,16 @@ class IntensiveSynthesis(Action):
                 progress -= 1
         state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
+        if state.waste_not > 0:
             durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
-            durability_loss = 3
         state.durability -= durability_loss
         state.cp -= 6
         return state
 
 
 class MuscleMemory(Action):
+    # Increases progress with efficiency of 300. Applies buff that increases efficiency of next progress action by 100
+    # if it is used within the next 5 turns. Costs 10 durability and 6 CP. Can only be used on the first turn.
 
     @staticmethod
     def execute(state):
@@ -173,13 +189,17 @@ class MuscleMemory(Action):
         # (but we will need to make sure we ONLY use this on the first turn)
         state.progress = progress
         state.muscle_memory = 5
-        state.cp -= 6
+        cp_loss = 6
+        if state.material_condition == "pliant":
+            cp_loss = 3
+        state.cp -= cp_loss
         state.durability -= 10
         return state
 
 
 class BrandoftheElements(Action):
-    # This one works weird with another buff so we have to modify progress calculation
+    # Increases progress with an efficiency of 100. Costs 10 durability and 6 CP. If Name of the Elements is active,
+    # progress efficiency scales based on remaining progress (more remaining progress = bigger progress bonus).
 
     @staticmethod
     def execute(state):
@@ -197,12 +217,16 @@ class BrandoftheElements(Action):
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 6
+        cp_loss = 6
+        if state.material_condition == "pliant":
+            cp_loss = 3
+        state.cp -= cp_loss
         return state
 
     @staticmethod
     def __calc_progress(state, efficiency):
         # Source:  https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
+        # This one works with another buff so we have to modify the progress calculation.
         p1 = BrandoftheElements.__CRAFTSMANSHIP * 21 / 100 + 2
         p2 = p1 * (BrandoftheElements.__CRAFTSMANSHIP + 10000) / (2620 + 10000)
         p3 = p2 * 80 / 100
@@ -219,24 +243,35 @@ class BrandoftheElements(Action):
 
 
 class NameoftheElements(Action):
+    # Applies buff that makes Brand of the Elements scale its progress efficiency based on progress remaining in the
+    # craft. Costs 30 CP. Lasts 3 turns.
 
     @staticmethod
     def execute(state):
         state.name_elements = 3
-        state.cp -= 30
+        cp_loss = 30
+        if state.material_condition == "pliant":
+            cp_loss = 15
+        state.cp -= cp_loss
         return state
 
 
 class Veneration(Action):
+    # Increases progress action efficiency by 50 for 4 steps. Costs 18 CP.
 
     @staticmethod
     def execute(state):
         state.veneration = 4
-        state.cp -= 18
+        cp_loss = 18
+        if state.material_condition == "pliant":
+            cp_loss = 9
+        state.cp -= cp_loss
         return state
 
 
 class FinalAppraisal(Action):
+    # Leaves 1 progress remaining on a craft if it would have been completed for the next 5 turns. Falls off when craft
+    # would have been completed. Costs 1 CP.
 
     @staticmethod
     def execute(state):
@@ -246,6 +281,7 @@ class FinalAppraisal(Action):
 
 
 class DelicateSynthesis(Action):
+    # Increases progress and quality at the same time with an efficiency of 100. Costs 10 durability and 32 CP.
 
     @staticmethod
     def execute(state):
@@ -267,11 +303,15 @@ class DelicateSynthesis(Action):
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 32
+        cp_loss = 32
+        if state.material_condition == "pliant":
+            cp_loss = 16
+        state.cp -= cp_loss
         return state
 
 
 class BasicTouch(Action):
+    # Increases quality with an efficiency of 100. Costs 10 durability and 18 CP.
 
     @staticmethod
     def execute(state):
@@ -286,19 +326,27 @@ class BasicTouch(Action):
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 18
+        cp_loss = 18
+        if state.material_condition == "pliant":
+            cp_loss = 9
+        state.cp -= cp_loss
         return state
 
 
 class HastyTouch(Action):
+    # Increases quality with an efficiency of 100. Has a 60% success rate. Costs 10 durability and 0 CP.
 
     @staticmethod
     def execute(state):
-        quality, state = HastyTouch.__calc_quality(state, 100)
-        quality += state.quality
-        if quality > HastyTouch.__MAX_QUALITY:
-            quality = HastyTouch.__MAX_QUALITY
-        state.quality = quality
+        success_threshold = 60
+        if state.material_condition == "centered":
+            success_threshold += 25
+        if state.success_val <= success_threshold:
+            quality, state = HastyTouch.__calc_quality(state, 100)
+            quality += state.quality
+            if quality > HastyTouch.__MAX_QUALITY:
+                quality = HastyTouch.__MAX_QUALITY
+            state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 or state.material_condition == "sturdy":
             durability_loss = 5
@@ -309,6 +357,7 @@ class HastyTouch(Action):
 
 
 class StandardTouch(Action):
+    # Increases quality with an efficiency of 125. Costs 10 durability and 32 CP.
 
     @staticmethod
     def execute(state):
@@ -323,11 +372,15 @@ class StandardTouch(Action):
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 32
+        cp_loss = 32
+        if state.material_condition == "pliant":
+            cp_loss = 16
+        state.cp -= cp_loss
         return state
 
 
 class PreparatoryTouch(Action):
+    # Increases quality with an efficiency of 200. Costs 20 durability and 40 CP.
 
     @staticmethod
     def execute(state):
@@ -342,13 +395,18 @@ class PreparatoryTouch(Action):
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 5
         state.durability -= durability_loss
-        state.cp -= 40
+        cp_loss = 40
+        if state.material_condition == "pliant":
+            cp_loss = 20
+        state.cp -= cp_loss
         if 0 < state.iq_stacks < 11:
             state.iq_stacks += 1
         return state
 
 
 class PreciseTouch(Action):
+    # Increases quality with an efficiency of 150. Grants an extra Inner Quiet stack. Can only be used when Material
+    # Condition is Good. Costs 10 durability and 18 CP.
 
     @staticmethod
     def execute(state):
@@ -358,10 +416,8 @@ class PreciseTouch(Action):
             quality = PreciseTouch.__MAX_QUALITY
         state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
+        if state.waste_not > 0:
             durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
-            durability_loss = 3
         state.durability -= durability_loss
         state.cp -= 18
         if 0 < state.iq_stacks < 11:
@@ -370,30 +426,44 @@ class PreciseTouch(Action):
 
 
 class PatientTouch(Action):
-    # Unsure whether to handle failure condition in this class or in the test; maybe have failure function?
+    # Increases quality with efficiency of 100. Has a 50% chance of success. If it succeeds, Inner Quiet stacks are
+    # doubled, respecting the maximum of 11 stacks. If it fails, Inner Quiet stacks are cut in half. Costs 10 durability
+    # and 6 CP.
 
     @staticmethod
     def execute(state):
-        quality, state = PatientTouch.__calc_quality(state, 100)
-        quality += state.quality
-        if quality > PatientTouch.__MAX_QUALITY:
-            quality = PatientTouch.__MAX_QUALITY
-        state.quality = quality
+        success_threshold = 50
+        if state.material_condition == "centered":
+            success_threshold += 25
+        if state.success_val <= success_threshold:
+            quality, state = PatientTouch.__calc_quality(state, 100)
+            quality += state.quality
+            if quality > PatientTouch.__MAX_QUALITY:
+                quality = PatientTouch.__MAX_QUALITY
+            state.quality = quality
+            if 0 < state.iq_stacks < 11:
+                state.iq_stacks = (state.iq_stacks - 1) * 2  # quality function increased stacks by 1
+                if state.iq_stacks > 11:
+                    state.iq_stacks = 11
+        else:
+            if state.iq_stacks > 0:
+                state.iq_stacks = math.ceil(state.iq_stacks / 2)
         durability_loss = 10
         if state.waste_not > 0 or state.material_condition == "sturdy":
             durability_loss = 5
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 6
-        if 0 < state.iq_stacks < 11:
-            state.iq_stacks = (state.iq_stacks - 1) * 2  # quality function increased stacks by 1
-            if state.iq_stacks > 11:
-                state.iq_stacks = 11
+        cp_loss = 6
+        if state.material_condition == "pliant":
+            cp_loss = 3
+        state.cp -= cp_loss
         return state
 
 
 class PrudentTouch(Action):
+    # Increases quality with an efficiency of 100. Costs 5 durability and 25 CP. Cannot be used while either Waste Not
+    # buff is active.
 
     @staticmethod
     def execute(state):
@@ -406,11 +476,16 @@ class PrudentTouch(Action):
         if state.material_condition == "sturdy":  # cannot be used while waste not is active
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 25
+        cp_loss = 25
+        if state.material_condition == "pliant":
+            cp_loss = 13
+        state.cp -= cp_loss
         return state
 
 
 class Reflect(Action):
+    # Increases quality with an efficiency of 100 and grants 3 Inner Quiet stacks. Costs 10 durability and 24 CP. Can
+    # only be used on the first turn.
 
     @staticmethod
     def execute(state):
@@ -420,11 +495,16 @@ class Reflect(Action):
         state.quality = quality
         state.iq_stacks = 3
         state.durability -= 10
-        state.cp -= 24
+        cp_loss = 24
+        if state.material_condition == "pliant":
+            cp_loss = 12
+        state.cp -= cp_loss
         return state
 
 
 class ByregotsBlessing(Action):
+    # Increases quality with an efficiency of 100 plus an extra 20 for every Inner Quiet stack past 1. Consumes all
+    # Inner Quiet stacks upon use. Costs 10 durability and 24 CP.
 
     @staticmethod
     def execute(state):
@@ -440,127 +520,188 @@ class ByregotsBlessing(Action):
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 24
+        cp_loss = 24
+        if state.material_condition == "pliant":
+            cp_loss = 12
+        state.cp -= cp_loss
         return state
 
 
 class GreatStrides(Action):
+    # Increases the efficiency of the next quality action by 100. Falls off after 3 turns if not consumed. Costs 32 CP.
 
     @staticmethod
     def execute(state):
         state.great_strides = 3
-        state.cp -= 32
+        cp_loss = 32
+        if state.material_condition == "pliant":
+            cp_loss = 16
+        state.cp -= cp_loss
         return state
 
 
 class Innovation(Action):
+    # Increases the efficiency of all quality actions by 50 for 4 turns. Costs 18 CP.
 
     @staticmethod
     def execute(state):
         state.innovation = 4
-        state.cp -= 18
+        cp_loss = 18
+        if state.material_condition == "pliant":
+            cp_loss = 9
+        state.cp -= cp_loss
         return state
 
 
 class InnerQuiet(Action):
+    # Applies a buff that allows stacks to be accumulated. Each stack increases Control, which affects output of quality
+    # actions. A value of 1 offers no bonus, but all stacks after 1 apply the bonus additively. Maximum 11 stacks. Costs
+    # 18 CP.
 
     @staticmethod
     def execute(state):
         state.iq_stacks = 1
-        state.cp -= 18
+        cp_loss = 18
+        if state.material_condition == "pliant":
+            cp_loss = 9
+        state.cp -= cp_loss
         return state
 
 
 class Observe(Action):
+    # Does nothing and moves to the next turn. Costs 7 CP.
 
     @staticmethod
     def execute(state):
         state.observe = 1
-        state.cp -= 7
+        cp_loss = 7
+        if state.material_condition == "pliant":
+            cp_loss = 4
+        state.cp -= cp_loss
         return state
 
 
 class FocusedSynthesis(Action):
+    # Increases progress with efficiency of 200. Has a 50% chance of success on its own, but 100% chance if used on the
+    # turn after Observe. Costs 10 durability and 5 CP.
 
     @staticmethod
     def execute(state):
-        progress, state = FocusedSynthesis.__calc_progress(state, 200)
-        progress += state.progress
-        if progress > FocusedSynthesis.__MAX_PROGRESS:
-            progress = FocusedSynthesis.__MAX_PROGRESS
-            if state.final_appraisal > 0:
-                # Check whether the buff falls off after you've "consumed" it; assuming yes for now
-                state.final_appraisal = 0
-                progress -= 1  # leave craft 1 progress off from completion
-        state.progress = progress
+        success_threshold = 50
+        if state.observe > 0:
+            success_threshold = 100
+        elif state.material_condition == "centered":
+            success_threshold += 25
+        if state.success_val <= success_threshold:
+            progress, state = FocusedSynthesis.__calc_progress(state, 200)
+            progress += state.progress
+            if progress > FocusedSynthesis.__MAX_PROGRESS:
+                progress = FocusedSynthesis.__MAX_PROGRESS
+                if state.final_appraisal > 0:
+                    state.final_appraisal = 0
+                    progress -= 1  # leave craft 1 progress off from completion
+            state.progress = progress
         durability_loss = 10
         if state.waste_not > 0 or state.material_condition == "sturdy":
             durability_loss = 5
         elif state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 5
+        cp_loss = 5
+        if state.material_condition == "pliant":
+            cp_loss = 3
+        state.cp -= cp_loss
         return state
 
 
 class FocusedTouch(Action):
+    # Increases quality with an efficiency of 150. Has a 50% chance of success on its own, but 100% chance if used on
+    # the turn after Observe. Costs 10 durability and 18 CP.
 
     @staticmethod
     def execute(state):
-        quality, state = FocusedTouch.__calc_quality(state, 150)
-        quality += state.quality
-        if quality > FocusedTouch.__MAX_QUALITY:
-            quality = FocusedTouch.__MAX_QUALITY
-        state.quality = quality
+        success_threshold = 50
+        if state.observe > 0:
+            success_threshold = 100
+        elif state.material_condition == "centered":
+            success_threshold += 25
+        if state.success_val <= success_threshold:
+            quality, state = FocusedTouch.__calc_quality(state, 150)
+            quality += state.quality
+            if quality > FocusedTouch.__MAX_QUALITY:
+                quality = FocusedTouch.__MAX_QUALITY
+            state.quality = quality
         durability_loss = 5
         if state.material_condition == "sturdy":  # cannot be used while waste not is active
             durability_loss = 3
         state.durability -= durability_loss
-        state.cp -= 18
+        cp_loss = 18
+        if state.material_condition == "pliant":
+            cp_loss = 9
+        state.cp -= cp_loss
         return state
 
 
 class TricksoftheTrade(Action):
+    # Restores 20 CP. Can only be used when Material Condition is Good.
 
     @staticmethod
     def execute(state):
         state.cp += 20
+        if state.cp > 572:
+            state.cp = 572
         return state
 
 
 class WasteNot(Action):
+    # Reduces durability cost by 50% for the next 4 turns. Costs 56 CP.
 
     @staticmethod
     def execute(state):
         state.waste_not = 4
-        state.cp -= 56
+        cp_loss = 56
+        if state.material_condition == "pliant":
+            cp_loss = 28
+        state.cp -= cp_loss
         return state
 
 
 class WasteNot2(Action):
+    # Reduces durability cost by 50% for the next 8 turns. Costs 98 CP.
 
     @staticmethod
     def execute(state):
         state.waste_not = 8
-        state.cp -= 98
+        cp_loss = 98
+        if state.material_condition == "pliant":
+            cp_loss = 49
+        state.cp -= cp_loss
         return state
 
 
 class MastersMend(Action):
+    # Restores durability by 30 points (cannot go over maximum). Costs 88 CP.
 
     @staticmethod
     def execute(state):
         state.durability += 30
         if state.durability > 50:
             state.durability = 50
-        state.cp -= 88
+        cp_loss = 88
+        if state.material_condition == "pliant":
+            cp_loss = 44
+        state.cp -= cp_loss
         return state
 
 
 class Manipulation(Action):
+    # Restores durability by 5 points at the end of every turn for the next 8 turns. Costs 96 CP.
 
     @staticmethod
     def execute(state):
         state.manipulation = 8
-        state.cp -= 96
+        cp_loss = 96
+        if state.material_condition == "pliant":
+            cp_loss = 48
+        state.cp -= cp_loss
         return state
