@@ -22,9 +22,21 @@ class TestResources:
 
     @staticmethod
     def generate_material_conditions():
+        # Probabilities sourced from:
+        # https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
         conditions = [0]  # First state is always normal
         for i in range(1, TestResources.__SEQUENCE_LENGTH):
-            conditions.append(random.randint(0, 4))
+            randVal = random.randint(0, 99)
+            if 0 <= randVal <= 11:
+                conditions.append(1)  # Good
+            elif 12 <= randVal <= 26:
+                conditions.append(3)  # Centered
+            elif 27 <= randVal <= 38:
+                conditions.append(2)  # Pliant
+            elif 39 <= randVal <= 53:
+                conditions.append(4)  # Sturdy
+            else:
+                conditions.append(0)  # Normal
         return conditions
 
     @staticmethod
