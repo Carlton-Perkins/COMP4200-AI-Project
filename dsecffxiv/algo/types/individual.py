@@ -9,11 +9,14 @@ from typing import Any, List
 
 
 class Individual():
+    """Generic Individual interface."""
 
     def __init__(self, value: List[Any]):
+        """Construct indiv with a predefined list."""
         self.value = value
 
     def __str__(self):
+        """Printer for generic Individuals."""
         output = "["
         size = len(self.value)
         for member_index in range(0, size):
@@ -21,3 +24,7 @@ class Individual():
                 ("" if member_index == (size-1) else ", ")
         output = output + "]"
         return output
+
+    def __len__(self):
+        """Pass through method for len of value."""
+        len(self.value)
