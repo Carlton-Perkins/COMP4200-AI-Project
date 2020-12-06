@@ -81,7 +81,7 @@ class RapidSynthesis(Action):
 
     @staticmethod
     def execute(state):
-        success_threshold = 50
+        success_threshold = 49
         if state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
@@ -299,10 +299,10 @@ class DelicateSynthesis(Action):
             quality = DelicateSynthesis.__MAX_QUALITY
         state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 32
         if state.material_condition == "pliant":
@@ -322,10 +322,10 @@ class BasicTouch(Action):
             quality = BasicTouch.__MAX_QUALITY
         state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 18
         if state.material_condition == "pliant":
@@ -339,7 +339,7 @@ class HastyTouch(Action):
 
     @staticmethod
     def execute(state):
-        success_threshold = 60
+        success_threshold = 59
         if state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
@@ -349,10 +349,10 @@ class HastyTouch(Action):
                 quality = HastyTouch.__MAX_QUALITY
             state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         return state
 
@@ -368,10 +368,10 @@ class StandardTouch(Action):
             quality = StandardTouch.__MAX_QUALITY
         state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 32
         if state.material_condition == "pliant":
@@ -391,10 +391,10 @@ class PreparatoryTouch(Action):
             quality = PreparatoryTouch.__MAX_QUALITY
         state.quality = quality
         durability_loss = 20
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 10
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 5
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 10
         state.durability -= durability_loss
         cp_loss = 40
         if state.material_condition == "pliant":
@@ -433,7 +433,7 @@ class PatientTouch(Action):
 
     @staticmethod
     def execute(state):
-        success_threshold = 50
+        success_threshold = 49
         if state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
@@ -450,10 +450,10 @@ class PatientTouch(Action):
             if state.iq_stacks > 0:
                 state.iq_stacks = math.ceil(state.iq_stacks / 2)
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 6
         if state.material_condition == "pliant":
@@ -516,10 +516,10 @@ class ByregotsBlessing(Action):
             quality = ByregotsBlessing.__MAX_QUALITY
         state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 24
         if state.material_condition == "pliant":
@@ -588,7 +588,7 @@ class FocusedSynthesis(Action):
 
     @staticmethod
     def execute(state):
-        success_threshold = 50
+        success_threshold = 49
         if state.observe > 0:
             success_threshold = 100
         elif state.material_condition == "centered":
@@ -603,10 +603,10 @@ class FocusedSynthesis(Action):
                     progress -= 1  # leave craft 1 progress off from completion
             state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 5
         if state.material_condition == "pliant":
@@ -621,7 +621,7 @@ class FocusedTouch(Action):
 
     @staticmethod
     def execute(state):
-        success_threshold = 50
+        success_threshold = 49
         if state.observe > 0:
             success_threshold = 100
         elif state.material_condition == "centered":
@@ -632,9 +632,11 @@ class FocusedTouch(Action):
             if quality > FocusedTouch.__MAX_QUALITY:
                 quality = FocusedTouch.__MAX_QUALITY
             state.quality = quality
-        durability_loss = 5
-        if state.material_condition == "sturdy":  # cannot be used while waste not is active
+        durability_loss = 10
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 18
         if state.material_condition == "pliant":

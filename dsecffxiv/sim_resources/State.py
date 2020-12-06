@@ -1,9 +1,12 @@
+# Class representing the state of a craft. Each craft parameter and buff is included as an attribute, as well as a value
+# that is used to calculate whether certain actions succeed or fail.
+
 class State:
 
     CONDITIONS = ["normal", "good", "pliant", "centered", "sturdy"]
 
     def __init__(self, success):
-        # Success is an argument 0-100 that is used to determine the success of an action that can fail
+        # Success is an argument 0-99 that is used to determine the success of an action that can fail
         self.cp = 572
         self.progress = 0
         self.quality = 0
@@ -23,9 +26,11 @@ class State:
         self.success_val = success
 
     def update_condition(self, index):
+        # Updates condition of craft by indexing array of conditions.
         self.material_condition = State.CONDITIONS[index]
 
     def update_success(self, val):
+        # Updates value used to calculate success of stochastic actions.
         self.success_val = val
 
     def step(self):
@@ -54,6 +59,7 @@ class State:
                 self.durability = 50
 
     def evaluate(self):
+        # Calculates score based on craft parameters.
         if self.cp < 0 or (self.durability <= 0 and self.progress < 11126):
             return -1  # these are invalid states
         if self.progress < 11126 or self.quality < 58000:
@@ -65,9 +71,10 @@ class State:
             return 0.45 * (collectability - 6500) + 370
         if collectability >= 7700:
             return 0.3 * (collectability - 7700) + 1100
-        raise Exception("You forgot a case for state evaluation dumb dumb.\n\n{}".format(self))
+        raise Exception("You forgot a case for state evaluation.\n\n{}".format(self))
 
     def __str__(self):
+        # Returns string with each attribute of the state listed.
         state_string = "Step: {}\nProgress: {}\nQuality: {}\nDurability: {}\nCondition: {}\nCP: {}\nInner Quiet: {}\n" \
                        "Muscle Memory: {}\nName of the Elements: {}\nVeneration: {}\nFinal Appraisal: {}\n" \
                        "Great Strides: {}\nInnovation: {}\nObserve: {}\nWaste Not: {}\nManipulation: {}\n"\
