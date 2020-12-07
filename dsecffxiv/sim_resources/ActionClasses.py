@@ -7,24 +7,24 @@ import math
 
 class Action:
 
-    __CRAFTSMANSHIP = 2689
-    __CONTROL = 2872
-    __RLEVEL = 511
-    __CLEVEL = 420
-    __RCRAFTS = 2620
-    __RCONTROL = 2540
-    __MAX_PROGRESS = 11126
-    __MAX_QUALITY = 82400
+    _CRAFTSMANSHIP = 2689
+    _CONTROL = 2872
+    _RLEVEL = 511
+    _CLEVEL = 420
+    _RCRAFTS = 2620
+    _RCONTROL = 2540
+    _MAX_PROGRESS = 11126
+    _MAX_QUALITY = 82400
 
     @staticmethod
     def execute(state):
         pass
 
     @staticmethod
-    def __calc_progress(state, efficiency):
+    def _calc_progress(state, efficiency):
         # Source:  https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
-        p1 = Action.__CRAFTSMANSHIP * 21 / 100 + 2
-        p2 = p1 * (Action.__CRAFTSMANSHIP + 10000) / (2620 + 10000)
+        p1 = Action._CRAFTSMANSHIP * 21 / 100 + 2
+        p2 = p1 * (Action._CRAFTSMANSHIP + 10000) / (2620 + 10000)
         p3 = p2 * 80 / 100
         modifier = 100
         if state.muscle_memory > 0:
@@ -35,11 +35,11 @@ class Action:
         return math.floor(math.floor(p3) * (efficiency * modifier / 100)), state
 
     @staticmethod
-    def __calc_quality(state, efficiency):
+    def _calc_quality(state, efficiency):
         # Source:  https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
-        f_iq = Action.__CONTROL + Action.__CONTROL * ((state.iq_stacks - 1 if state.iq_stacks > 0 else 0) * 20 / 100)
+        f_iq = Action._CONTROL + Action._CONTROL * ((state.iq_stacks - 1 if state.iq_stacks > 0 else 0) * 20 / 100)
         q1 = f_iq * 35 / 100 + 35
-        q2 = q1 * (f_iq + 1000) / (Action.__RCONTROL + 10000)
+        q2 = q1 * (f_iq + 1000) / (Action._RCONTROL + 10000)
         q3 = q2 * 60 / 100
         modifier = 100
         if state.great_strides > 0:
@@ -59,10 +59,10 @@ class BasicSynthesis(Action):
 
     @staticmethod
     def execute(state):
-        progress, state = BasicSynthesis.__calc_progress(state, 120)
+        progress, state = BasicSynthesis._calc_progress(state, 120)
         progress += state.progress
-        if progress > BasicSynthesis.__MAX_PROGRESS:
-            progress = BasicSynthesis.__MAX_PROGRESS
+        if progress > BasicSynthesis._MAX_PROGRESS:
+            progress = BasicSynthesis._MAX_PROGRESS
             if state.final_appraisal > 0:
                 state.final_appraisal = 0
                 progress -= 1  # leave craft 1 progress off from completion
@@ -85,10 +85,10 @@ class RapidSynthesis(Action):
         if state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
-            progress, state = RapidSynthesis.__calc_progress(state, 500)
+            progress, state = RapidSynthesis._calc_progress(state, 500)
             progress += state.progress
-            if progress > RapidSynthesis.__MAX_PROGRESS:
-                progress = RapidSynthesis.__MAX_PROGRESS
+            if progress > RapidSynthesis._MAX_PROGRESS:
+                progress = RapidSynthesis._MAX_PROGRESS
                 if state.final_appraisal > 0:
                     state.final_appraisal = 0
                     progress -= 1
@@ -107,10 +107,10 @@ class CarefulSynthesis(Action):
 
     @staticmethod
     def execute(state):
-        progress, state = CarefulSynthesis.__calc_progress(state, 150)
+        progress, state = CarefulSynthesis._calc_progress(state, 150)
         progress += state.progress
-        if progress > CarefulSynthesis.__MAX_PROGRESS:
-            progress = CarefulSynthesis.__MAX_PROGRESS
+        if progress > CarefulSynthesis._MAX_PROGRESS:
+            progress = CarefulSynthesis._MAX_PROGRESS
             if state.final_appraisal > 0:
                 state.final_appraisal = 0
                 progress -= 1
@@ -142,10 +142,10 @@ class Groundwork(Action):
             durability_loss = 10
         if state.durability < durability_loss:
             efficiency = 150
-        progress, state = Groundwork.__calc_progress(state, efficiency)
+        progress, state = Groundwork._calc_progress(state, efficiency)
         progress += state.progress
-        if progress > Groundwork.__MAX_PROGRESS:
-            progress = Groundwork.__MAX_PROGRESS
+        if progress > Groundwork._MAX_PROGRESS:
+            progress = Groundwork._MAX_PROGRESS
             if state.final_appraisal > 0:
                 state.final_appraisal = 0
                 progress -= 1
@@ -163,10 +163,10 @@ class IntensiveSynthesis(Action):
 
     @staticmethod
     def execute(state):
-        progress, state = IntensiveSynthesis.__calc_progress(state, 300)
+        progress, state = IntensiveSynthesis._calc_progress(state, 300)
         progress += state.progress
-        if progress > IntensiveSynthesis.__MAX_PROGRESS:
-            progress = IntensiveSynthesis.__MAX_PROGRESS
+        if progress > IntensiveSynthesis._MAX_PROGRESS:
+            progress = IntensiveSynthesis._MAX_PROGRESS
             if state.final_appraisal > 0:
                 state.final_appraisal = 0
                 progress -= 1
@@ -185,7 +185,7 @@ class MuscleMemory(Action):
 
     @staticmethod
     def execute(state):
-        progress, state = MuscleMemory.__calc_progress(state, 300)
+        progress, state = MuscleMemory._calc_progress(state, 300)
         # This can only be used on the first turn, with 0 progress. No need for completion checking
         # (but we will need to make sure we ONLY use this on the first turn)
         state.progress = progress
@@ -204,10 +204,10 @@ class BrandoftheElements(Action):
 
     @staticmethod
     def execute(state):
-        progress, state = BrandoftheElements.__calc_progress(state, 100)
+        progress, state = BrandoftheElements._calc_progress(state, 100)
         progress += state.progress
-        if progress > BrandoftheElements.__MAX_PROGRESS:
-            progress = BrandoftheElements.__MAX_PROGRESS
+        if progress > BrandoftheElements._MAX_PROGRESS:
+            progress = BrandoftheElements._MAX_PROGRESS
             if state.final_appraisal > 0:
                 state.final_appraisal = 0
                 progress -= 1
@@ -225,11 +225,11 @@ class BrandoftheElements(Action):
         return state
 
     @staticmethod
-    def __calc_progress(state, efficiency):
+    def _calc_progress(state, efficiency):
         # Source:  https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
         # This one works with another buff so we have to modify the progress calculation.
-        p1 = BrandoftheElements.__CRAFTSMANSHIP * 21 / 100 + 2
-        p2 = p1 * (BrandoftheElements.__CRAFTSMANSHIP + 10000) / (2620 + 10000)
+        p1 = BrandoftheElements._CRAFTSMANSHIP * 21 / 100 + 2
+        p2 = p1 * (BrandoftheElements._CRAFTSMANSHIP + 10000) / (2620 + 10000)
         p3 = p2 * 80 / 100
         modifier = 100
         if state.muscle_memory > 0:
@@ -239,7 +239,7 @@ class BrandoftheElements(Action):
             modifier += 50
         f_efficiency = efficiency * modifier / 100
         if state.name_elements > 0:
-            f_efficiency = f_efficiency + 2 * math.ceil((1 - state.progress / BrandoftheElements.__MAX_PROGRESS) * 100)
+            f_efficiency = f_efficiency + 2 * math.ceil((1 - state.progress / BrandoftheElements._MAX_PROGRESS) * 100)
         return math.floor(math.floor(p3) * f_efficiency), state
 
 
@@ -286,17 +286,17 @@ class DelicateSynthesis(Action):
 
     @staticmethod
     def execute(state):
-        progress, state = DelicateSynthesis.__calc_progress(state, 100)
-        quality, state = DelicateSynthesis.__calc_quality(state, 100)
+        progress, state = DelicateSynthesis._calc_progress(state, 100)
+        quality, state = DelicateSynthesis._calc_quality(state, 100)
         progress += state.progress
-        if progress > DelicateSynthesis.__MAX_PROGRESS:
-            progress = DelicateSynthesis.__MAX_PROGRESS
+        if progress > DelicateSynthesis._MAX_PROGRESS:
+            progress = DelicateSynthesis._MAX_PROGRESS
             if state.final_appraisal > 0:
                 state.final_appraisal = 0
                 progress -= 1
         state.progress = progress
-        if quality > DelicateSynthesis.__MAX_QUALITY:
-            quality = DelicateSynthesis.__MAX_QUALITY
+        if quality > DelicateSynthesis._MAX_QUALITY:
+            quality = DelicateSynthesis._MAX_QUALITY
         state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
@@ -316,10 +316,10 @@ class BasicTouch(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = BasicTouch.__calc_quality(state, 100)
+        quality, state = BasicTouch._calc_quality(state, 100)
         quality += state.quality
-        if quality > BasicTouch.__MAX_QUALITY:
-            quality = BasicTouch.__MAX_QUALITY
+        if quality > BasicTouch._MAX_QUALITY:
+            quality = BasicTouch._MAX_QUALITY
         state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
@@ -343,10 +343,10 @@ class HastyTouch(Action):
         if state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
-            quality, state = HastyTouch.__calc_quality(state, 100)
+            quality, state = HastyTouch._calc_quality(state, 100)
             quality += state.quality
-            if quality > HastyTouch.__MAX_QUALITY:
-                quality = HastyTouch.__MAX_QUALITY
+            if quality > HastyTouch._MAX_QUALITY:
+                quality = HastyTouch._MAX_QUALITY
             state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
@@ -362,10 +362,10 @@ class StandardTouch(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = StandardTouch.__calc_quality(state, 125)
+        quality, state = StandardTouch._calc_quality(state, 125)
         quality += state.quality
-        if quality > StandardTouch.__MAX_QUALITY:
-            quality = StandardTouch.__MAX_QUALITY
+        if quality > StandardTouch._MAX_QUALITY:
+            quality = StandardTouch._MAX_QUALITY
         state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
@@ -385,10 +385,10 @@ class PreparatoryTouch(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = PreparatoryTouch.__calc_quality(state, 200)
+        quality, state = PreparatoryTouch._calc_quality(state, 200)
         quality += state.quality
-        if quality > PreparatoryTouch.__MAX_QUALITY:
-            quality = PreparatoryTouch.__MAX_QUALITY
+        if quality > PreparatoryTouch._MAX_QUALITY:
+            quality = PreparatoryTouch._MAX_QUALITY
         state.quality = quality
         durability_loss = 20
         if state.waste_not > 0 and state.material_condition == "sturdy":
@@ -411,10 +411,10 @@ class PreciseTouch(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = PreciseTouch.__calc_quality(state, 150)
+        quality, state = PreciseTouch._calc_quality(state, 150)
         quality += state.quality
-        if quality > PreciseTouch.__MAX_QUALITY:
-            quality = PreciseTouch.__MAX_QUALITY
+        if quality > PreciseTouch._MAX_QUALITY:
+            quality = PreciseTouch._MAX_QUALITY
         state.quality = quality
         durability_loss = 10
         if state.waste_not > 0:  # Material condition must be Good; cannot be Sturdy
@@ -437,10 +437,10 @@ class PatientTouch(Action):
         if state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
-            quality, state = PatientTouch.__calc_quality(state, 100)
+            quality, state = PatientTouch._calc_quality(state, 100)
             quality += state.quality
-            if quality > PatientTouch.__MAX_QUALITY:
-                quality = PatientTouch.__MAX_QUALITY
+            if quality > PatientTouch._MAX_QUALITY:
+                quality = PatientTouch._MAX_QUALITY
             state.quality = quality
             if 0 < state.iq_stacks < 11:
                 state.iq_stacks = (state.iq_stacks - 1) * 2  # quality function increased stacks by 1
@@ -468,10 +468,10 @@ class PrudentTouch(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = PrudentTouch.__calc_quality(state, 100)
+        quality, state = PrudentTouch._calc_quality(state, 100)
         quality += state.quality
-        if quality > PrudentTouch.__MAX_QUALITY:
-            quality = PrudentTouch.__MAX_QUALITY
+        if quality > PrudentTouch._MAX_QUALITY:
+            quality = PrudentTouch._MAX_QUALITY
         state.quality = quality
         durability_loss = 5
         if state.material_condition == "sturdy":  # cannot be used while waste not is active
@@ -490,7 +490,7 @@ class Reflect(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = Reflect.__calc_quality(state, 100)
+        quality, state = Reflect._calc_quality(state, 100)
         # This can only be used on the first turn, with 0 quality. No need for over-cap checking
         # (but we will need to make sure we ONLY use this on the first turn)
         state.quality = quality
@@ -509,11 +509,11 @@ class ByregotsBlessing(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = ByregotsBlessing.__calc_quality(state, 100 + 20 * (state.iq_stacks - 1))
+        quality, state = ByregotsBlessing._calc_quality(state, 100 + 20 * (state.iq_stacks - 1))
         state.iq_stacks = 0
         quality += state.quality
-        if quality > ByregotsBlessing.__MAX_QUALITY:
-            quality = ByregotsBlessing.__MAX_QUALITY
+        if quality > ByregotsBlessing._MAX_QUALITY:
+            quality = ByregotsBlessing._MAX_QUALITY
         state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
@@ -594,10 +594,10 @@ class FocusedSynthesis(Action):
         elif state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
-            progress, state = FocusedSynthesis.__calc_progress(state, 200)
+            progress, state = FocusedSynthesis._calc_progress(state, 200)
             progress += state.progress
-            if progress > FocusedSynthesis.__MAX_PROGRESS:
-                progress = FocusedSynthesis.__MAX_PROGRESS
+            if progress > FocusedSynthesis._MAX_PROGRESS:
+                progress = FocusedSynthesis._MAX_PROGRESS
                 if state.final_appraisal > 0:
                     state.final_appraisal = 0
                     progress -= 1  # leave craft 1 progress off from completion
@@ -627,10 +627,10 @@ class FocusedTouch(Action):
         elif state.material_condition == "centered":
             success_threshold += 25
         if state.success_val <= success_threshold:
-            quality, state = FocusedTouch.__calc_quality(state, 150)
+            quality, state = FocusedTouch._calc_quality(state, 150)
             quality += state.quality
-            if quality > FocusedTouch.__MAX_QUALITY:
-                quality = FocusedTouch.__MAX_QUALITY
+            if quality > FocusedTouch._MAX_QUALITY:
+                quality = FocusedTouch._MAX_QUALITY
             state.quality = quality
         durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
