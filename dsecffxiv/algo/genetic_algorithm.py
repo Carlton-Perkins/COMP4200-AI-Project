@@ -11,6 +11,7 @@ from dsecffxiv.algo.score import Default_Score, Score
 from dsecffxiv.algo.selection import Default_Selection, Selection
 from dsecffxiv.algo.types.individual import Individual
 from dsecffxiv.algo.types.population import Population
+from dsecffxiv.sim_resources.TestResources import generate_material_conditions, generate_success_values
 
 
 class GeneticAlgorithm():
@@ -25,6 +26,9 @@ class GeneticAlgorithm():
         self.crossover_func: Crossover = Default_Crossover
         self.score_func: Score = Default_Score
 
+        self.material_conditions = generate_material_conditions(config['population_size'])
+        self.success_rolls = generate_success_values(config['population_size'])
+
         self.population: Union[Population, None] = None
 
     def step(self):
@@ -34,7 +38,9 @@ class GeneticAlgorithm():
             self.population = generate_new_population(
                 self.config['population_size'],
                 self.config['domain'],
-                self.config['individual_size'])
+                self.config['individual_size'],
+                self.material_conditions,
+                self.success_rolls)
 
         # Score population
         self.population.sort(key=self.score_func, reverse=True)
@@ -79,7 +85,9 @@ class ThreadedGeneticAlgorithm(GeneticAlgorithm):
             self.population = generate_new_population(
                 self.config['population_size'],
                 self.config['domain'],
-                self.config['individual_size'])
+                self.config['individual_size'],
+                self.material_conditions,
+                self.success_rolls)
 
             # Score init population
             self.population.sort(key=self.score_func, reverse=True)

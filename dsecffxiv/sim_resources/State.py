@@ -5,7 +5,7 @@ class State:
 
     CONDITIONS = ["normal", "good", "pliant", "centered", "sturdy"]
 
-    def __init__(self, success):
+    def __init__(self):
         # Success is an argument 0-99 that is used to determine the success of an action that can fail
         self.cp = 572
         self.progress = 0
@@ -23,7 +23,7 @@ class State:
         self.observe = 0
         self.waste_not = 0
         self.manipulation = 0
-        self.success_val = success
+        self.success_val = 0  # Never used on first step (Muscle Memory and Reflect are not stochastic)
 
     def update_condition(self, index):
         # Updates condition of craft by indexing array of conditions.
@@ -60,10 +60,12 @@ class State:
 
     def evaluate(self):
         # Calculates score based on craft parameters.
-        if self.cp < 0 or (self.durability <= 0 and self.progress < 11126):
-            return -1  # these are invalid states
+        if self.cp < 0 \
+                or (self.durability <= 0 and self.progress < 11126) \
+                or (self.progress >= 11126 and self.quality < 58000):
+            return -1  # these states are undesirable and the simulation should not continue.
         if self.progress < 11126 or self.quality < 58000:
-            return 0  # got to end of sequence with no reward, but craft isn't broken/invalid
+            return 0  # haven't finished craft
         collectability = self.quality // 10  # Find skyward score for craft
         if 5800 <= collectability < 6500:
             return 0.1 * (collectability - 5800) + 175

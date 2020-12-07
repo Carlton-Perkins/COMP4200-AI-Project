@@ -6,7 +6,7 @@ from dsecffxiv.algo.types import Domain, Individual, Population
 from dsecffxiv.sim_resources import TestResources, ActionClasses
 
 
-def generate_new_individual(domain: Domain, size: int, material_conditions) -> Individual:
+def generate_new_individual(domain: Domain, size: int, material_conditions, success_rolls) -> Individual:
     """Generate a random new Individual of the give size and domain."""
     indiv = list()  # List of action from domain
     # Have to put Waste Not buff handling here, since there's no way to get a state
@@ -17,20 +17,20 @@ def generate_new_individual(domain: Domain, size: int, material_conditions) -> I
             waste_not = 5  # Extra turn because of decrement
         elif random_action is ActionClasses.WasteNot2:
             waste_not = 9
-        indiv.append(random_action)
+        # The only way to keep the sorting method is to bundle all of these into a tuple
+        indiv.append((random_action, success_rolls[i], material_conditions[i]))
         if waste_not > 0:
             waste_not -= 1
     return Individual(indiv)
 
 
-def generate_new_population(population_size: int, domain: Domain, size: int) -> Population:
+def generate_new_population(population_size: int, domain: Domain, size: int, material_conditions, success_rolls)\
+        -> Population:
     """Generate a new population give a population size, domain, and individual size."""
     new_population = list()
-    material_conditions = TestResources.generate_material_conditions(size)
-    success_values = TestResources.generate_success_values(size)
     for _ in range(0, population_size):
         new_population.append(
-            generate_new_individual(domain, size, material_conditions))
+            generate_new_individual(domain, size, material_conditions, success_rolls))
     return new_population
 
 

@@ -1,4 +1,4 @@
-"""Runable shell to faclitate the genetic algorithm."""
+"""Runnable shell to facilitate the genetic algorithm."""
 
 # import gc
 import sys
