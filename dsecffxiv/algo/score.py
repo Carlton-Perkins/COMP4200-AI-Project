@@ -3,6 +3,7 @@
 from typing import Any
 
 from dsecffxiv.algo.types import Individual
+from dsecffxiv.sim_resources.State import State
 
 Score = Any
 # Score = Callable[[Individual], int]
@@ -22,6 +23,11 @@ def score_individual(indiv: Individual) -> int:
         if score > max_score:
             max_score = score
     return max_score
+
+# def score_craft(individual):
+#     craft_state = State()
+#     for step in range(0, len(individual.value)):
+
 
 
 Default_Score = score_individual

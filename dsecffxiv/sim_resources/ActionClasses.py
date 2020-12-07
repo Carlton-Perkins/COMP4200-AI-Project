@@ -68,10 +68,10 @@ class BasicSynthesis(Action):
                 progress -= 1  # leave craft 1 progress off from completion
         state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
+            durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
             durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
-            durability_loss = 3  # rounds against player
         state.durability -= durability_loss
         return state
 
@@ -94,10 +94,10 @@ class RapidSynthesis(Action):
                     progress -= 1
             state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         return state
 
@@ -136,10 +136,10 @@ class Groundwork(Action):
     def execute(state):
         durability_loss = 20
         efficiency = 300
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 10
         if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 5
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 10
         if state.durability < durability_loss:
             efficiency = 150
         progress, state = Groundwork.__calc_progress(state, efficiency)
@@ -172,7 +172,7 @@ class IntensiveSynthesis(Action):
                 progress -= 1
         state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0:
+        if state.waste_not > 0:  # Material condition must be Good; cannot be Sturdy
             durability_loss = 5
         state.durability -= durability_loss
         state.cp -= 6
@@ -213,10 +213,10 @@ class BrandoftheElements(Action):
                 progress -= 1
         state.progress = progress
         durability_loss = 10
-        if state.waste_not > 0 or state.material_condition == "sturdy":
-            durability_loss = 5
-        elif state.waste_not > 0 and state.material_condition == "sturdy":
+        if state.waste_not > 0 and state.material_condition == "sturdy":
             durability_loss = 3
+        elif state.waste_not > 0 or state.material_condition == "sturdy":
+            durability_loss = 5
         state.durability -= durability_loss
         cp_loss = 6
         if state.material_condition == "pliant":
@@ -417,7 +417,7 @@ class PreciseTouch(Action):
             quality = PreciseTouch.__MAX_QUALITY
         state.quality = quality
         durability_loss = 10
-        if state.waste_not > 0:
+        if state.waste_not > 0:  # Material condition must be Good; cannot be Sturdy
             durability_loss = 5
         state.durability -= durability_loss
         state.cp -= 18

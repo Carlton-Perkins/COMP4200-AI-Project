@@ -49,21 +49,21 @@ def generate_success_values(sequence_length):
     return values
 
 
-def get_random_action(state):
+def get_random_action(step_number, material_condition, waste_not):
     # Gets a random valid action based on the state.
     # (Will add CP checks if necessary, but that would be a lot of extra calculation.)
-    if state.step_number == 0:  # Opening actions should always be used and can only be used now
+    if step_number == 0:  # Opening actions should always be used and can only be used now
         return first_step_actions[random.randint(0, 1)]
-    elif state.material_condition == "good":  # Good condition has exclusive actions
+    elif material_condition == "good":  # Good condition has exclusive actions
         i = random.randrange(0, len(good_condition_actions))
         # Prudent Touch cannot be used while Waste Not buff is active
-        if state.waste_not > 0 and i == good_condition_actions.index(action.PrudentTouch):
+        if waste_not > 0 and i == good_condition_actions.index(action.PrudentTouch):
             while i == good_condition_actions.index(action.PrudentTouch):
                 i = random.randrange(0, len(good_condition_actions))
         return good_condition_actions[random.randrange(0, len(good_condition_actions))]
     i = random.randrange(0, len(actions))
     # Prudent Touch cannot be used while Waste Not buff is active
-    if state.waste_not > 0 and i == actions.index(action.PrudentTouch):
+    if waste_not > 0 and i == actions.index(action.PrudentTouch):
         while i == actions.index(action.PrudentTouch):
             i = random.randrange(0, len(actions))
     return actions[random.randrange(0, len(actions))]

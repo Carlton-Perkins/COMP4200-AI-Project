@@ -26,7 +26,7 @@ class GeneticAlgorithm():
         self.population: Union[Population, None] = None
 
     def step(self):
-        """Preform one generation of the GA."""
+        """Perform one generation of the GA."""
         # Init population
         if self.population is None:
             self.population = generate_new_population(
