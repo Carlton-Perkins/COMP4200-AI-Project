@@ -30,18 +30,20 @@ def score_craft(individual):
     step_list = individual.value
     score = 0
     # DEBUG
-    print(step_list)
+    # print(step_list)
     for step in range(0, len(step_list)):
         try:
             craft_state.update_success(step_list[step][1])  # Get bundled success value
             craft_state.update_condition(step_list[step][2])  # Get bundled material value
             craft_state = step_list[step][0].execute(craft_state)
             craft_state.step()
-            if craft_state.evaluate() != 0:  # The craft broke, we ran out of CP, or we've completed the craft
+            score = craft_state.evaluate()
+            if score != 0:  # The craft broke, we ran out of CP, or we've completed the craft
+                print("Craft Parameters:\n{}\nScore: {}\n".format(craft_state, score))
                 return score
         except:
             print("Step: {}\n{}".format(step, step_list[step]))
-    return craft_state.evaluate()
+    return score
 
 
 Default_Score = score_craft

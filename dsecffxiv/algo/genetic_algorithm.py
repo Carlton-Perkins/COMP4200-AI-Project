@@ -79,7 +79,7 @@ class ThreadedGeneticAlgorithm(GeneticAlgorithm):
         self.thread_pool = ThreadPoolExecutor(64)
 
     def step(self):
-        """Preform one generation of the GA."""
+        """Perform one generation of the GA."""
         # Init population
         if self.population is None:
             self.population = generate_new_population(

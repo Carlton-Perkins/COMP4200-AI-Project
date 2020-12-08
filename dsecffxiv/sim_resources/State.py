@@ -12,7 +12,7 @@ class State:
         self.quality = 0
         self.durability = 50
         self.material_condition = State.CONDITIONS[0]
-        self.step_number = 0
+        self.step_number = 1
         self.iq_stacks = 0
         self.muscle_memory = 0
         self.name_elements = 0
@@ -47,7 +47,7 @@ class State:
         if self.great_strides > 0:
             self.great_strides -= 1
         if self.innovation > 0:
-            self.great_strides -= 1
+            self.innovation -= 1
         if self.observe > 0:
             self.observe -= 1
         if self.waste_not > 0:
@@ -80,7 +80,7 @@ class State:
         state_string = "Step: {}\nProgress: {}\nQuality: {}\nDurability: {}\nCondition: {}\nCP: {}\nInner Quiet: {}\n" \
                        "Muscle Memory: {}\nName of the Elements: {}\nVeneration: {}\nFinal Appraisal: {}\n" \
                        "Great Strides: {}\nInnovation: {}\nObserve: {}\nWaste Not: {}\nManipulation: {}\n"\
-            .format(self.step, self.progress, self.quality, self.durability, self.material_condition, self.cp,
+            .format(self.step_number, self.progress, self.quality, self.durability, self.material_condition, self.cp,
                     self.iq_stacks, self.muscle_memory, self.name_elements, self.veneration, self.final_appraisal,
                     self.great_strides, self.innovation, self.observe, self.waste_not, self.manipulation)
         return state_string
