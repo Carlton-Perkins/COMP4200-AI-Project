@@ -58,13 +58,25 @@ def get_random_action(step_number, material_condition, waste_not, inner_quiet, n
     elif material_condition == "good":  # Good condition has exclusive actions
         i = random.randrange(0, len(good_condition_actions))
         # Prudent Touch cannot be used while Waste Not buff is active. Inner Quiet cannot be used while user has stacks.
-        while (waste_not > 0 and i == good_condition_actions.index(action.PrudentTouch)) or\
-                (inner_quiet and i == good_condition_actions.index(action.InnerQuiet)):
+        # Other buffs should not be used while they are already up.
+        while (waste_not > 0 and i == good_condition_actions.index(action.PrudentTouch)) or \
+                (inner_quiet and i == good_condition_actions.index(action.InnerQuiet)) or \
+                (name_elements > 0 and i == good_condition_actions.index(action.NameoftheElements)) or \
+                (veneration > 0 and i == good_condition_actions.index(action.Veneration)) or \
+                (great_strides > 0 and i == good_condition_actions.index(action.GreatStrides)) or \
+                (innovation > 0 and i == good_condition_actions.index(action.Innovation)) or \
+                (manipulation > 0 and i == good_condition_actions.index(action.Manipulation)):
             i = random.randrange(0, len(good_condition_actions))
         return good_condition_actions[random.randrange(0, len(good_condition_actions))]
     i = random.randrange(0, len(actions))
     # Prudent Touch cannot be used while Waste Not buff is active. Inner Quiet cannot be used while user has stacks.
+    # Other buffs should not be used while they are already up.
     while (waste_not > 0 and i == actions.index(action.PrudentTouch)) or \
-            (inner_quiet and i == actions.index(action.InnerQuiet)):
+            (inner_quiet and i == actions.index(action.InnerQuiet)) or \
+            (name_elements > 0 and i == actions.index(action.NameoftheElements)) or \
+            (veneration > 0 and i == actions.index(action.Veneration)) or \
+            (great_strides > 0 and i == actions.index(action.GreatStrides)) or \
+            (innovation > 0 and i == actions.index(action.Innovation)) or \
+            (manipulation > 0 and i == actions.index(action.Manipulation)):
         i = random.randrange(0, len(actions))
     return actions[random.randrange(0, len(actions))]
