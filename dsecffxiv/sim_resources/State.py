@@ -54,9 +54,10 @@ class State:
             self.waste_not -= 1
         if self.manipulation > 0:
             self.manipulation -= 1
-            self.durability += 5
-            if self.durability > 50:
-                self.durability = 50
+            if self.durability > 0:  # Only apply if craft isn't broken
+                self.durability += 5
+                if self.durability > 50:
+                    self.durability = 50
 
     def evaluate(self):
         # Calculates score based on craft parameters.

@@ -4,22 +4,24 @@ import dsecffxiv.sim_resources.ActionClasses as action
 
 # Contains support functions for generating test environment and handling action selection.
 
-# Arrays containing actions, organized by availability based on state
+# Arrays containing actions, organized by availability based on state and sorted by CP cost in each array
 first_step_actions = [action.MuscleMemory, action.Reflect]
-good_condition_actions = [action.BasicSynthesis, action.RapidSynthesis, action.CarefulSynthesis, action.Groundwork,
-                          action.IntensiveSynthesis, action.BrandoftheElements, action.NameoftheElements,
-                          action.Veneration, action.FinalAppraisal, action.DelicateSynthesis, action.BasicTouch,
-                          action.HastyTouch, action.StandardTouch, action.PreparatoryTouch, action.PreciseTouch,
-                          action.PatientTouch, action.PrudentTouch, action.ByregotsBlessing, action.GreatStrides,
-                          action.Innovation, action.InnerQuiet, action.Observe, action.FocusedSynthesis,
-                          action.FocusedTouch, action.TricksoftheTrade, action.WasteNot, action.WasteNot2,
-                          action.MastersMend, action.Manipulation]
-actions = [action.BasicSynthesis, action.RapidSynthesis, action.CarefulSynthesis, action.Groundwork,
-           action.BrandoftheElements, action.NameoftheElements, action.Veneration, action.FinalAppraisal,
-           action.DelicateSynthesis, action.BasicTouch, action.HastyTouch, action.StandardTouch,
-           action.PreparatoryTouch, action.PatientTouch, action.PrudentTouch, action.ByregotsBlessing,
-           action.GreatStrides, action.Innovation, action.InnerQuiet, action.Observe, action.FocusedSynthesis,
-           action.FocusedTouch, action.WasteNot, action.WasteNot2, action.MastersMend, action.Manipulation]
+good_condition_actions = [action.TricksoftheTrade, action.RapidSynthesis, action.HastyTouch, action.BasicSynthesis,
+                          action.FocusedSynthesis, action.IntensiveSynthesis, action.PatientTouch,
+                          action.BrandoftheElements, action.CarefulSynthesis, action.Observe, action.Veneration,
+                          action.Innovation, action.BasicTouch, action.PreciseTouch, action.FocusedTouch,
+                          action.InnerQuiet, action.Groundwork, action.ByregotsBlessing, action.PrudentTouch,
+                          action.NameoftheElements, action.DelicateSynthesis, action.StandardTouch, action.GreatStrides,
+                          action.PreparatoryTouch, action.WasteNot, action.MastersMend, action.Manipulation,
+                          action.WasteNot2, action.FinalAppraisal]
+actions = [action.RapidSynthesis, action.HastyTouch, action.BasicSynthesis, action.FocusedSynthesis,
+           action.PatientTouch, action.BrandoftheElements, action.CarefulSynthesis, action.Observe, action.Veneration,
+           action.Innovation, action.BasicTouch, action.FocusedTouch, action.InnerQuiet, action.Groundwork,
+           action.ByregotsBlessing, action.PrudentTouch, action.NameoftheElements, action.DelicateSynthesis,
+           action.StandardTouch, action.GreatStrides, action.PreparatoryTouch, action.WasteNot, action.MastersMend,
+           action.Manipulation, action.WasteNot2, action.FinalAppraisal]
+low_durability_actions = [action.MastersMend, action.Manipulation]
+observe_actions = [action.FocusedSynthesis, action.FocusedTouch]
 
 
 def generate_material_conditions(sequence_length):
