@@ -60,12 +60,12 @@ class State:
 
     def evaluate(self):
         # Calculates score based on craft parameters.
-        if self.cp < 0 \
-                or (self.durability <= 0 and self.progress < 11126) \
-                or (self.progress >= 11126 and self.quality < 58000):
+        if self.cp < 0 or (self.durability <= 0 and self.progress < 11126):
             return -1  # these states are undesirable and the simulation should not continue.
         if self.progress < 11126 or self.quality < 58000:
             return 0  # haven't finished craft
+        if self.progress >= 11126 and self.quality < 58000:
+            return self.quality / 1000
         collectability = self.quality // 10  # Find skyward score for craft
         if 5800 <= collectability < 6500:
             return 0.1 * (collectability - 5800) + 175

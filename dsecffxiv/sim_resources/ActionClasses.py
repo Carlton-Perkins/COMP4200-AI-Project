@@ -32,14 +32,14 @@ class Action:
             state.muscle_memory = 0
         if state.veneration > 0:
             modifier += 50
-        return math.floor(math.floor(p3) * (efficiency * modifier / 100)), state
+        return math.floor(math.floor(p3) * (efficiency / 100 * modifier / 100)), state
 
     @staticmethod
     def _calc_quality(state, efficiency):
         # Source:  https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
         f_iq = Action._CONTROL + Action._CONTROL * ((state.iq_stacks - 1 if state.iq_stacks > 0 else 0) * 20 / 100)
         q1 = f_iq * 35 / 100 + 35
-        q2 = q1 * (f_iq + 1000) / (Action._RCONTROL + 10000)
+        q2 = q1 * (f_iq + 10000) / (Action._RCONTROL + 10000)
         q3 = q2 * 60 / 100
         modifier = 100
         if state.great_strides > 0:
@@ -49,13 +49,18 @@ class Action:
             modifier += 50
         if 0 < state.iq_stacks < 11:
             state.iq_stacks += 1
-        return math.floor(
-            math.floor(q3 * 150 if state.material_condition == "good" else 100)
-            * (efficiency * modifier / 100)), state
+        if state.material_condition == "good":
+            condition = 150
+        else:
+            condition = 100
+        return math.floor(math.floor(q3 * condition / 100) * (efficiency / 100 * modifier / 100)), state
 
 
 class BasicSynthesis(Action):
     # Increases progress with efficiency of 120. Costs 10 durability and 0 CP.
+
+    CP_COST = 0
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -78,6 +83,9 @@ class BasicSynthesis(Action):
 
 class RapidSynthesis(Action):
     # Increases progress with efficiency of 500. Has a 50% success rate. Costs 10 durability and 0 CP.
+
+    CP_COST = 0
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -105,6 +113,9 @@ class RapidSynthesis(Action):
 class CarefulSynthesis(Action):
     # Increases progress with efficiency of 150. Costs 10 durability and 7 CP.
 
+    CP_COST = 7
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         progress, state = CarefulSynthesis._calc_progress(state, 150)
@@ -131,6 +142,9 @@ class CarefulSynthesis(Action):
 class Groundwork(Action):
     # Increases progress with efficiency of 300. Costs 20 durability and 18 CP. If current durability is less than the
     # cost of the action, efficiency is reduced to 150.
+
+    CP_COST = 18
+    DURABILITY_COST = 20
 
     @staticmethod
     def execute(state):
@@ -161,6 +175,9 @@ class IntensiveSynthesis(Action):
     # Increases progress with efficiency of 300. Can only be used when Material Condition is Good. Costs 10 durability
     # and 6 CP.
 
+    CP_COST = 6
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         progress, state = IntensiveSynthesis._calc_progress(state, 300)
@@ -183,6 +200,9 @@ class MuscleMemory(Action):
     # Increases progress with efficiency of 300. Applies buff that increases efficiency of next progress action by 100
     # if it is used within the next 5 turns. Costs 10 durability and 6 CP. Can only be used on the first turn.
 
+    CP_COST = 6
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         progress, state = MuscleMemory._calc_progress(state, 300)
@@ -201,6 +221,9 @@ class MuscleMemory(Action):
 class BrandoftheElements(Action):
     # Increases progress with an efficiency of 100. Costs 10 durability and 6 CP. If Name of the Elements is active,
     # progress efficiency scales based on remaining progress (more remaining progress = bigger progress bonus).
+
+    CP_COST = 6
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -247,6 +270,9 @@ class NameoftheElements(Action):
     # Applies buff that makes Brand of the Elements scale its progress efficiency based on progress remaining in the
     # craft. Costs 30 CP. Lasts 3 turns.
 
+    CP_COST = 30
+    DURABILITY_COST = 0
+
     @staticmethod
     def execute(state):
         state.name_elements = 4  # Extra turn because step always decrements
@@ -259,6 +285,9 @@ class NameoftheElements(Action):
 
 class Veneration(Action):
     # Increases progress action efficiency by 50 for 4 steps. Costs 18 CP.
+
+    CP_COST = 18
+    DURABILITY_COST = 0
 
     @staticmethod
     def execute(state):
@@ -274,6 +303,9 @@ class FinalAppraisal(Action):
     # Leaves 1 progress remaining on a craft if it would have been completed for the next 5 turns. Falls off when craft
     # would have been completed. Costs 1 CP.
 
+    CP_COST = 1
+    DURABILITY_COST = 0
+
     @staticmethod
     def execute(state):
         state.final_appraisal = 6  # Extra turn because step always decrements
@@ -283,6 +315,9 @@ class FinalAppraisal(Action):
 
 class DelicateSynthesis(Action):
     # Increases progress and quality at the same time with an efficiency of 100. Costs 10 durability and 32 CP.
+
+    CP_COST = 32
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -314,6 +349,9 @@ class DelicateSynthesis(Action):
 class BasicTouch(Action):
     # Increases quality with an efficiency of 100. Costs 10 durability and 18 CP.
 
+    CP_COST = 18
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         quality, state = BasicTouch._calc_quality(state, 100)
@@ -336,6 +374,9 @@ class BasicTouch(Action):
 
 class HastyTouch(Action):
     # Increases quality with an efficiency of 100. Has a 60% success rate. Costs 10 durability and 0 CP.
+
+    CP_COST = 0
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -360,6 +401,9 @@ class HastyTouch(Action):
 class StandardTouch(Action):
     # Increases quality with an efficiency of 125. Costs 10 durability and 32 CP.
 
+    CP_COST = 32
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         quality, state = StandardTouch._calc_quality(state, 125)
@@ -382,6 +426,9 @@ class StandardTouch(Action):
 
 class PreparatoryTouch(Action):
     # Increases quality with an efficiency of 200. Costs 20 durability and 40 CP.
+
+    CP_COST = 40
+    DURABILITY_COST = 20
 
     @staticmethod
     def execute(state):
@@ -409,6 +456,9 @@ class PreciseTouch(Action):
     # Increases quality with an efficiency of 150. Grants an extra Inner Quiet stack. Can only be used when Material
     # Condition is Good. Costs 10 durability and 18 CP.
 
+    CP_COST = 18
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         quality, state = PreciseTouch._calc_quality(state, 150)
@@ -430,6 +480,9 @@ class PatientTouch(Action):
     # Increases quality with efficiency of 100. Has a 50% chance of success. If it succeeds, Inner Quiet stacks are
     # doubled, respecting the maximum of 11 stacks. If it fails, Inner Quiet stacks are cut in half. Costs 10 durability
     # and 6 CP.
+
+    CP_COST = 6
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -466,6 +519,9 @@ class PrudentTouch(Action):
     # Increases quality with an efficiency of 100. Costs 5 durability and 25 CP. Cannot be used while either Waste Not
     # buff is active.
 
+    CP_COST = 25
+    DURABILITY_COST = 5
+
     @staticmethod
     def execute(state):
         quality, state = PrudentTouch._calc_quality(state, 100)
@@ -488,6 +544,9 @@ class Reflect(Action):
     # Increases quality with an efficiency of 100 and grants 3 Inner Quiet stacks. Costs 10 durability and 24 CP. Can
     # only be used on the first turn.
 
+    CP_COST = 24
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         quality, state = Reflect._calc_quality(state, 100)
@@ -506,6 +565,9 @@ class Reflect(Action):
 class ByregotsBlessing(Action):
     # Increases quality with an efficiency of 100 plus an extra 20 for every Inner Quiet stack past 1. Consumes all
     # Inner Quiet stacks upon use. Costs 10 durability and 24 CP.
+
+    CP_COST = 24
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -531,6 +593,9 @@ class ByregotsBlessing(Action):
 class GreatStrides(Action):
     # Increases the efficiency of the next quality action by 100. Falls off after 3 turns if not consumed. Costs 32 CP.
 
+    CP_COST = 32
+    DURABILITY_COST = 0
+
     @staticmethod
     def execute(state):
         state.great_strides = 4  # Extra turn because step always decrements
@@ -543,6 +608,9 @@ class GreatStrides(Action):
 
 class Innovation(Action):
     # Increases the efficiency of all quality actions by 50 for 4 turns. Costs 18 CP.
+
+    CP_COST = 18
+    DURABILITY_COST = 0
 
     @staticmethod
     def execute(state):
@@ -559,6 +627,9 @@ class InnerQuiet(Action):
     # actions. A value of 1 offers no bonus, but all stacks after 1 apply the bonus additively. Maximum 11 stacks. Costs
     # 18 CP.
 
+    CP_COST = 18
+    DURABILITY_COST = 0
+
     @staticmethod
     def execute(state):
         state.iq_stacks = 1
@@ -571,6 +642,9 @@ class InnerQuiet(Action):
 
 class Observe(Action):
     # Does nothing and moves to the next turn. Costs 7 CP.
+
+    CP_COST = 7
+    DURABILITY_COST = 0
 
     @staticmethod
     def execute(state):
@@ -585,6 +659,9 @@ class Observe(Action):
 class FocusedSynthesis(Action):
     # Increases progress with efficiency of 200. Has a 50% chance of success on its own, but 100% chance if used on the
     # turn after Observe. Costs 10 durability and 5 CP.
+
+    CP_COST = 5
+    DURABILITY_COST = 10
 
     @staticmethod
     def execute(state):
@@ -619,6 +696,9 @@ class FocusedTouch(Action):
     # Increases quality with an efficiency of 150. Has a 50% chance of success on its own, but 100% chance if used on
     # the turn after Observe. Costs 10 durability and 18 CP.
 
+    CP_COST = 18
+    DURABILITY_COST = 10
+
     @staticmethod
     def execute(state):
         success_threshold = 49
@@ -648,6 +728,9 @@ class FocusedTouch(Action):
 class TricksoftheTrade(Action):
     # Restores 20 CP. Can only be used when Material Condition is Good.
 
+    CP_COST = -20  # subtract a negative number to get a positive number
+    DURABILITY_COST = 0
+
     @staticmethod
     def execute(state):
         state.cp += 20
@@ -658,6 +741,9 @@ class TricksoftheTrade(Action):
 
 class WasteNot(Action):
     # Reduces durability cost by 50% for the next 4 turns. Costs 56 CP.
+
+    CP_COST = 56
+    DURABILITY_COST = 0
 
     @staticmethod
     def execute(state):
@@ -672,6 +758,9 @@ class WasteNot(Action):
 class WasteNot2(Action):
     # Reduces durability cost by 50% for the next 8 turns. Costs 98 CP.
 
+    CP_COST = 98
+    DURABILITY_COST = 0
+
     @staticmethod
     def execute(state):
         state.waste_not = 9  # Extra turn because step always decrements
@@ -684,6 +773,9 @@ class WasteNot2(Action):
 
 class MastersMend(Action):
     # Restores durability by 30 points (cannot go over maximum). Costs 88 CP.
+
+    CP_COST = 88
+    DURABILITY_COST = 0
 
     @staticmethod
     def execute(state):
@@ -699,6 +791,9 @@ class MastersMend(Action):
 
 class Manipulation(Action):
     # Restores durability by 5 points at the end of every turn for the next 8 turns. Costs 96 CP.
+
+    CP_COST = 96
+    DURABILITY_COST = 0
 
     @staticmethod
     def execute(state):
