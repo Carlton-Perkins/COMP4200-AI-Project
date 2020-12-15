@@ -61,7 +61,13 @@ def get_random_action(step_number, material_condition, waste_not, inner_quiet, n
     remaining_cp_ratio = cp / MAX_CP
     if step_number == 0:  # Opening actions should always be used and can only be used now
         return first_step_actions[random.randint(0, 1)]
-    elif material_condition == "good":  # Good condition has exclusive actions
+    elif durability <= 25:
+        i = random.randrange(0, 1)
+        if low_durability_actions[i].CP_COST > cp:
+            i = abs(i - 1)  # gives 0 if it was 1, 1 if it was 0
+            if low_durability_actions[i].CP_COST <= cp:
+                return low_durability_actions[i]  # if cp is too low for either, move on
+    if material_condition == "good":  # Good condition has exclusive actions
         # low CP ratio will result in lower CP skills being chosen
         i = random.randrange(0, ceil(len(good_condition_actions) * remaining_cp_ratio))
         # Prudent Touch cannot be used while Waste Not buff is active. Inner Quiet cannot be used while user has stacks.

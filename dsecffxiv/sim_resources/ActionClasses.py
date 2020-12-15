@@ -262,7 +262,7 @@ class BrandoftheElements(Action):
             modifier += 50
         f_efficiency = efficiency / 100 * modifier / 100
         if state.name_elements > 0:
-            f_efficiency = f_efficiency + 2 * math.ceil((1 - state.progress / BrandoftheElements._MAX_PROGRESS) * 100)
+            f_efficiency = f_efficiency + 2 * math.ceil(1 - state.progress / BrandoftheElements._MAX_PROGRESS)
         return math.floor(math.floor(p3) * f_efficiency), state
 
 
