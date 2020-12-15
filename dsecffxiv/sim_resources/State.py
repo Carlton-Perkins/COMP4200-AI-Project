@@ -66,7 +66,7 @@ class State:
         if self.progress < 11126 or self.quality < 58000:
             return 0  # haven't finished craft
         if self.progress >= 11126 and self.quality < 58000:
-            return self.quality / 100
+            return self.quality / 1000
         collectability = self.quality // 10  # Find skyward score for craft
         if 5800 <= collectability < 6500:
             return 0.1 * (collectability - 5800) + 175

@@ -260,7 +260,7 @@ class BrandoftheElements(Action):
             state.muscle_memory = 0
         if state.veneration > 0:
             modifier += 50
-        f_efficiency = efficiency * modifier / 100
+        f_efficiency = efficiency / 100 * modifier / 100
         if state.name_elements > 0:
             f_efficiency = f_efficiency + 2 * math.ceil((1 - state.progress / BrandoftheElements._MAX_PROGRESS) * 100)
         return math.floor(math.floor(p3) * f_efficiency), state
