@@ -13,8 +13,9 @@ from dsecffxiv.algo.types import Individual
 from dsecffxiv.algo.types.population import Population
 
 GEN_LIMIT = 2500
-JOB_COUNT = 100
+JOB_COUNT = 500
 WORKER_LIMIT = 32
+MAX_SCORE_LEN_CAP = 50
 
 
 def assemble_config() -> Dict:
@@ -37,8 +38,14 @@ def do_stat_math(input_population_history: List[Population], score_function: Cal
     stat_min = list()
     stat_max = list()
     stat_avg = list()
+    max_pop = None
 
     for generation_pop in tqdm(input_population_history, desc='Generating Stats'):
+        if max_pop is None:
+            max_pop = generation_pop[0]
+        else:
+            max_pop = max(max_pop, generation_pop[0], key=score_function)
+
         stat_min.append(score_function(generation_pop[-1]))
         stat_max.append(score_function(generation_pop[0]))
         avg = 0.0
@@ -51,7 +58,7 @@ def do_stat_math(input_population_history: List[Population], score_function: Cal
     stat_generation_max = list(range(0, len(stat_max)))
     stat_generation_avg = list(range(0, len(stat_avg)))
 
-    return ((stat_generation_min, stat_min), (stat_generation_max, stat_max), (stat_generation_avg, stat_avg))
+    return ((stat_generation_min, stat_min), (stat_generation_max, stat_max), (stat_generation_avg, stat_avg), max_pop)
 
 
 def do_run() -> List[Population]:
@@ -71,7 +78,7 @@ def do_run() -> List[Population]:
 
         pop_history.append(ga.population)
 
-        if max_score_len > 100:
+        if max_score_len > MAX_SCORE_LEN_CAP:
             break
     return pop_history
 
@@ -89,15 +96,24 @@ if __name__ == '__main__':
     with ProcessPoolExecutor(WORKER_LIMIT) as tp:
         res = tp.map(
             do_stat_math, pop_history_collection)
+        max_pop = None
         for r in tqdm(res):
-            (min_g, min_v), (max_g, max_v), (avg_g, avg_v) = r
-            plt.plot(min_g, min_v, '-', label='Min Score')
+            (min_g, min_v), (max_g, max_v), (avg_g, avg_v), m_pop = r
+
+            if max_pop is None:
+                max_pop = m_pop
+            else:
+                max_pop = max(max_pop, m_pop, key=Default_Score)
+
+            # plt.plot(min_g, min_v, '-', label='Min Score')
             plt.plot(max_g, max_v, '-.', label='Max Score')
-            plt.plot(avg_g, avg_v, ':', label='Avg Score')
+            # plt.plot(avg_g, avg_v, ':', label='Avg Score')
+
+    print("{0} => {1}".format(str(max_pop), Default_Score(max_pop)))
 
     plt.xlabel('Generation')
     plt.ylabel('Score')
 
     plt.title('Min/Max/Avg Score vs Generation')
-    plt.legend()
+    # plt.legend()
     plt.show()
