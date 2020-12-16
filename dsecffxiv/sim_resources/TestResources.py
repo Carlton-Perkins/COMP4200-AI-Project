@@ -1,7 +1,7 @@
 import random
 from math import ceil
-import dsecffxiv.sim_resources.ActionClasses as action
 
+import dsecffxiv.sim_resources.ActionClasses as action
 
 # Contains support functions for generating test environment and handling action selection.
 

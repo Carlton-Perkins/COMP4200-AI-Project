@@ -111,7 +111,7 @@ class GenAlgShell(cmd2.Cmd):
     @with_argument_list
     def do_leaderboard(self, args):
         """Print the leaderboard for scores."""
-        length = args[0] if len(args) == 1 else 5
+        length = int(args[0]) if len(args) == 1 else 5
 
         print_leaderboard(self.genetic_algorithm.population,
                           self.genetic_algorithm.score_func, length)

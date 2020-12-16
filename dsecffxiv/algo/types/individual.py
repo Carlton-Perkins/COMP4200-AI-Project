@@ -20,7 +20,8 @@ class Individual():
         output = "["
         size = len(self.value)
         for member_index in range(0, size):
-            output = output + str(self.value[member_index]) + \
+            which, a, b = self.value[member_index]
+            output = output + "{0}:{1}:{2}".format(which.__name__, a, b) + \
                 ("" if member_index == (size-1) else ", ")
         output = output + "]"
         return output
