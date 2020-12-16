@@ -32,7 +32,7 @@ def generate_material_conditions(sequence_length):
     # Probabilities sourced from:
     # https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
     conditions = [0]  # First state is always normal
-    for i in range(1, sequence_length):
+    for _ in range(1, sequence_length):
         rand_val = random.randint(0, 99)
         if 0 <= rand_val <= 11:
             conditions.append(1)  # Good
@@ -50,7 +50,7 @@ def generate_material_conditions(sequence_length):
 def generate_success_values(sequence_length):
     # Generates success chance values that are used to determine the success or failure of certain actions.
     values = []
-    for i in range(0, sequence_length):
+    for _ in range(0, sequence_length):
         values.append(random.randint(0, 99))
     return values
 
@@ -61,15 +61,17 @@ def get_random_action(step_number, material_condition, waste_not, inner_quiet, n
     remaining_cp_ratio = cp / MAX_CP
     if step_number == 0:  # Opening actions should always be used and can only be used now
         return first_step_actions[random.randint(0, 1)]
-    elif durability <= 25:
+    if durability <= 25:
         i = random.randrange(0, 1)
         if low_durability_actions[i].CP_COST > cp:
             i = abs(i - 1)  # gives 0 if it was 1, 1 if it was 0
             if low_durability_actions[i].CP_COST <= cp:
-                return low_durability_actions[i]  # if cp is too low for either, move on
+                # if cp is too low for either, move on
+                return low_durability_actions[i]
     if material_condition == "good":  # Good condition has exclusive actions
         # low CP ratio will result in lower CP skills being chosen
-        i = random.randrange(0, ceil(len(good_condition_actions) * remaining_cp_ratio))
+        i = random.randrange(
+            0, ceil(len(good_condition_actions) * remaining_cp_ratio))
         # Prudent Touch cannot be used while Waste Not buff is active. Inner Quiet cannot be used while user has stacks.
         # Other buffs should not be used while they are already up.
         while (waste_not > 0 and i == good_condition_actions.index(action.PrudentTouch)) or \
@@ -79,7 +81,8 @@ def get_random_action(step_number, material_condition, waste_not, inner_quiet, n
                 (great_strides > 0 and i == good_condition_actions.index(action.GreatStrides)) or \
                 (innovation > 0 and i == good_condition_actions.index(action.Innovation)) or \
                 (manipulation > 0 and i == good_condition_actions.index(action.Manipulation)):
-            i = random.randrange(0, ceil(len(good_condition_actions) * remaining_cp_ratio))
+            i = random.randrange(
+                0, ceil(len(good_condition_actions) * remaining_cp_ratio))
         return good_condition_actions[i]
     i = random.randrange(0, ceil(len(actions) * remaining_cp_ratio))
     # Prudent Touch cannot be used while Waste Not buff is active. Inner Quiet cannot be used while user has stacks.

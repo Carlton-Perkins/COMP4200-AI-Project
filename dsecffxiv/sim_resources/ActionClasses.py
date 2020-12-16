@@ -37,7 +37,8 @@ class Action:
     @staticmethod
     def _calc_quality(state, efficiency):
         # Source:  https://docs.google.com/document/d/1Da48dDVPB7N4ignxGeo0UeJ_6R0kQRqzLUH-TkpSQRc/edit
-        f_iq = Action._CONTROL + Action._CONTROL * ((state.iq_stacks - 1 if state.iq_stacks > 0 else 0) * 20 / 100)
+        f_iq = Action._CONTROL + Action._CONTROL * \
+            ((state.iq_stacks - 1 if state.iq_stacks > 0 else 0) * 20 / 100)
         q1 = f_iq * 35 / 100 + 35
         q2 = q1 * (f_iq + 10000) / (Action._RCONTROL + 10000)
         q3 = q2 * 60 / 100
@@ -54,6 +55,9 @@ class Action:
         else:
             condition = 100
         return math.floor(math.floor(q3 * condition / 100) * (efficiency / 100 * modifier / 100)), state
+
+    def __str__(self) -> str:
+        return __name__
 
 
 class BasicSynthesis(Action):
@@ -262,7 +266,9 @@ class BrandoftheElements(Action):
             modifier += 50
         f_efficiency = efficiency / 100 * modifier / 100
         if state.name_elements > 0:
-            f_efficiency = f_efficiency + 2 * math.ceil(1 - state.progress / BrandoftheElements._MAX_PROGRESS)
+            f_efficiency = f_efficiency + 2 * \
+                math.ceil(1 - state.progress /
+                          BrandoftheElements._MAX_PROGRESS)
         return math.floor(math.floor(p3) * f_efficiency), state
 
 
@@ -496,7 +502,8 @@ class PatientTouch(Action):
                 quality = PatientTouch._MAX_QUALITY
             state.quality = quality
             if 0 < state.iq_stacks < 11:
-                state.iq_stacks = (state.iq_stacks - 1) * 2  # quality function increased stacks by 1
+                # quality function increased stacks by 1
+                state.iq_stacks = (state.iq_stacks - 1) * 2
                 if state.iq_stacks > 11:
                     state.iq_stacks = 11
         else:
@@ -571,7 +578,8 @@ class ByregotsBlessing(Action):
 
     @staticmethod
     def execute(state):
-        quality, state = ByregotsBlessing._calc_quality(state, 100 + 20 * (state.iq_stacks - 1))
+        quality, state = ByregotsBlessing._calc_quality(
+            state, 100 + 20 * (state.iq_stacks - 1))
         state.iq_stacks = 0
         quality += state.quality
         if quality > ByregotsBlessing._MAX_QUALITY:
